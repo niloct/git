@@ -31,15 +31,21 @@ static int abspath_part_inside_repo(char *path)
 	char *path0;
 	int off;
 	const char *work_tree = get_git_work_tree();
+    printf("called abspath_part_inside_repo()\n");
+    printf("Worktree is: %s\n", work_tree);
+    printf("Path is: %s\n", path);
 
 	if (!work_tree)
 		return -1;
 	wtlen = strlen(work_tree);
 	len = strlen(path);
+    printf("Length of Worktree string is %zu\n", wtlen);
+    printf("Length of path string is %zu\n", len);
 	off = offset_1st_component(path);
 
 	/* check if work tree is already the prefix */
 	if (wtlen <= len && !fspathncmp(path, work_tree, wtlen)) {
+        printf("Working tree is already the prefix.\n");
 		if (path[wtlen] == '/') {
 			memmove(path, path + wtlen + 1, len - wtlen);
 			return 0;
@@ -66,6 +72,10 @@ static int abspath_part_inside_repo(char *path)
 			*path = '/';
 		}
 	}
+    printf("Final comparison that failed:\n");
+    printf("real_path(path0): %s\n", real_path(path0));
+    printf("against\n");
+    printf("work_tree: %s\n", work_tree);
 
 	/* check whole path */
 	if (fspathcmp(real_path(path0), work_tree) == 0) {
@@ -93,13 +103,16 @@ char *prefix_path_gently(const char *prefix, int len,
 	const char *orig = path;
 	char *sanitized;
 	if (is_absolute_path(orig)) {
+        printf("%s is absolute path...calling normalize_path_copy_len()\n", path);
 		sanitized = xmallocz(strlen(path));
 		if (remaining_prefix)
 			*remaining_prefix = 0;
 		if (normalize_path_copy_len(sanitized, path, remaining_prefix)) {
+            printf("normalize_path_copy_len() failed.\n");
 			free(sanitized);
 			return NULL;
 		}
+        printf("Normalized (Sanitized) path: %s\n", sanitized);
 		if (abspath_part_inside_repo(sanitized)) {
 			free(sanitized);
 			return NULL;

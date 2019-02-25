@@ -740,6 +740,7 @@ static int run_argv(int *argcp, const char ***argv)
 
 int cmd_main(int argc, const char **argv)
 {
+    printf("____Compiled version for debugging____.\n\n");
 	const char *cmd;
 	int done_help = 0;
 
